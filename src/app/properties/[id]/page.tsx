@@ -19,12 +19,14 @@ export default function PropertyDetailsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (id && allListings.length > 0) {
-      const foundListing = allListings.find(l => l.id === id);
+    if (id) {
+      // Re-read from localStorage to ensure we have the latest data
+      const listingsFromStorage = JSON.parse(window.localStorage.getItem('landListings') || '[]') as LandListing[];
+      const foundListing = listingsFromStorage.find(l => l.id === id);
       setListing(foundListing || null);
       setLoading(false);
     }
-  }, [id, allListings]);
+  }, [id]);
 
   if (loading) {
     return (
