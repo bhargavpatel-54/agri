@@ -20,13 +20,15 @@ export function SellerDashboard() {
   const [showForm, setShowForm] = useState(false);
 
   const handleNewListing = (newListing: LandListing) => {
+    // We receive the new listing, which might have a temporary image preview.
+    // The version saved to localStorage by the form should not have the image data.
     setListings(prev => [newListing, ...prev]);
     setShowForm(false);
   };
   
   // This is a simple way to simulate "my listings". In a real app this would be based on a userId.
-  // For this demo, we'll just assume the first 2 are the user's.
-  const myListings = listings.slice(0, 2);
+  // For this demo, we'll just assume all new listings are the user's.
+  const myListings = listings.filter(l => !dummyListings.some(d => d.id === l.id));
 
 
   return (
