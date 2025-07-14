@@ -10,36 +10,36 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-export const ResetPasswordInputSchema = z.object({
+const ResetPasswordInputSchema = z.object({
   email: z.string().email().describe('The email address to send the reset link to.'),
 });
 export type ResetPasswordInput = z.infer<typeof ResetPasswordInputSchema>;
 
-export const ResetPasswordOutputSchema = z.object({
+const ResetPasswordOutputSchema = z.object({
   emailContent: z.string().describe('The simulated email body that would be sent.'),
 });
 export type ResetPasswordOutput = z.infer<typeof ResetPasswordOutputSchema>;
 
 export async function requestPasswordReset(input: ResetPasswordInput): Promise<ResetPasswordOutput> {
+  const resetPasswordFlow = ai.defineFlow(
+    {
+      name: 'resetPasswordFlow',
+      inputSchema: ResetPasswordInputSchema,
+      outputSchema: ResetPasswordOutputSchema,
+    },
+    async (input) => {
+      const prompt = ai.definePrompt({
+        name: 'resetPasswordPrompt',
+        input: { schema: ResetPasswordInputSchema },
+        output: { schema: ResetPasswordOutputSchema },
+        prompt: `You are a security assistant. A user with the email '{{{email}}}' has requested a password reset for their KrishiConnect account.
+Generate the plain text email body for the password reset email. Include a fictional, non-functional reset link.`,
+      });
+
+      const { output } = await prompt(input);
+      return output!;
+    }
+  );
+
   return resetPasswordFlow(input);
 }
-
-const prompt = ai.definePrompt({
-  name: 'resetPasswordPrompt',
-  input: { schema: ResetPasswordInputSchema },
-  output: { schema: ResetPasswordOutputSchema },
-  prompt: `You are a security assistant. A user with the email '{{{email}}}' has requested a password reset for their KrishiConnect account.
-Generate the plain text email body for the password reset email. Include a fictional, non-functional reset link.`,
-});
-
-const resetPasswordFlow = ai.defineFlow(
-  {
-    name: 'resetPasswordFlow',
-    inputSchema: ResetPasswordInputSchema,
-    outputSchema: ResetPasswordOutputSchema,
-  },
-  async (input) => {
-    const { output } = await prompt(input);
-    return output!;
-  }
-);
