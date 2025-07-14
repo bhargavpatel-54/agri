@@ -1,6 +1,5 @@
-"use client";
+'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -10,37 +9,31 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { useLocalStorage } from '@/hooks/use-local-storage';
-import { Tractor, LogIn } from 'lucide-react';
+import { Tractor, Send } from 'lucide-react';
 import Link from 'next/link';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters.' }),
 });
 
-export function LoginForm() {
+export function ForgotPasswordForm() {
   const router = useRouter();
   const { toast } = useToast();
-  const [_, setLoggedIn] = useLocalStorage('isLoggedIn', false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
-      password: '',
     },
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    // Dummy authentication
-    console.log('Login attempt with:', values);
-    setLoggedIn(true);
+    console.log('Password reset request for:', values.email);
     toast({
-      title: "Login Successful",
-      description: "Welcome to KrishiConnect!",
+      title: 'Request Sent',
+      description: 'If an account with that email exists, we have sent a password reset link.',
     });
-    router.push('/dashboard');
+    router.push('/login');
   };
 
   return (
@@ -50,8 +43,8 @@ export function LoginForm() {
             <Tractor className="h-10 w-10 text-primary" />
             <h1 className="text-4xl font-headline font-bold text-primary">KrishiConnect</h1>
         </div>
-        <CardTitle className="text-2xl font-headline">Welcome Back</CardTitle>
-        <CardDescription>Enter your credentials to access your account</CardDescription>
+        <CardTitle className="text-2xl font-headline">Forgot Password</CardTitle>
+        <CardDescription>Enter your email to receive a reset link.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -61,7 +54,7 @@ export function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email or Phone</FormLabel>
+                  <FormLabel>Email Address</FormLabel>
                   <FormControl>
                     <Input placeholder="name@example.com" {...field} />
                   </FormControl>
@@ -69,35 +62,17 @@ export function LoginForm() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Password</FormLabel>
-                    <Link href="/forgot-password" className="text-sm font-medium text-primary hover:underline">
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" size="lg">
-              <LogIn className="mr-2 h-5 w-5" /> Login
+              <Send className="mr-2 h-5 w-5" /> Send Reset Link
             </Button>
           </form>
         </Form>
       </CardContent>
       <CardFooter className="flex justify-center">
          <p className="text-sm">
-            Don't have an account?{' '}
-            <Link href="/register" className="font-semibold text-primary hover:underline">
-                Sign up
+            Remember your password?{' '}
+            <Link href="/login" className="font-semibold text-primary hover:underline">
+                Login here
             </Link>
         </p>
       </CardFooter>
