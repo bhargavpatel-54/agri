@@ -77,14 +77,13 @@ export function PostLandForm({ onNewListing }: PostLandFormProps) {
     const newListing: LandListing = {
       id: new Date().toISOString(),
       ...values,
-      // For the UI display, we can use the preview.
-      image: imagePreview || undefined,
+      image: imagePreview || 'https://placehold.co/600x400.png', // Use preview for display
     };
-
-    // The listing saved to localStorage should not contain the base64 image.
+    
+    // Create a version for storage *without* the large base64 image data
     const listingForStorage: LandListing = {
-        ...newListing,
-        image: undefined, // Explicitly remove image for storage
+      ...newListing,
+      image: 'https://placehold.co/600x400.png', // Use a placeholder for storage
     };
 
     onNewListing(listingForStorage);

@@ -18,18 +18,15 @@ const dummyListings: LandListing[] = [
 export function SellerDashboard() {
   const [listings, setListings] = useLocalStorage<LandListing[]>('landListings', dummyListings);
   const [showForm, setShowForm] = useState(false);
+  const [myListingIds, setMyListingIds] = useLocalStorage<string[]>('myListingIds', []);
 
   const handleNewListing = (newListing: LandListing) => {
-    // We receive the new listing, which might have a temporary image preview.
-    // The version saved to localStorage by the form should not have the image data.
     setListings(prev => [newListing, ...prev]);
+    setMyListingIds(prev => [newListing.id, ...prev]);
     setShowForm(false);
   };
   
-  // This is a simple way to simulate "my listings". In a real app this would be based on a userId.
-  // For this demo, we'll just assume all new listings are the user's.
-  const myListings = listings.filter(l => !dummyListings.some(d => d.id === l.id));
-
+  const myListings = listings.filter(l => myListingIds.includes(l.id));
 
   return (
     <div className="space-y-8">
