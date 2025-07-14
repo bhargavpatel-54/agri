@@ -3,7 +3,6 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { Navbar } from '@/components/dashboard/navbar';
 
 export default function DashboardLayout({
   children,
@@ -16,7 +15,7 @@ export default function DashboardLayout({
   useEffect(() => {
     // This check runs on the client after hydration
     if (isLoggedIn === false) {
-      router.push('/');
+      router.push('/login');
     }
   }, [isLoggedIn, router]);
 
@@ -31,7 +30,6 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
       <main className="flex-grow">{children}</main>
     </div>
   );
