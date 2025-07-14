@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 
@@ -11,21 +11,28 @@ export default function DashboardLayout({
 }) {
   const [isLoggedIn] = useLocalStorage('isLoggedIn', false);
   const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    // This check runs on the client after hydration
-    if (isLoggedIn === false) {
+    // Wait until isLoggedIn has been determined from localStorage.
+    // The value can be `undefined` initially from the hook.
+    if (isLoggedIn === undefined) {
+      return;
+    }
+
+    if (!isLoggedIn) {
       router.push('/login');
+    } else {
+      setIsChecking(false);
     }
   }, [isLoggedIn, router]);
 
-  // Render a loading state or null while checking auth status
-  if (isLoggedIn === undefined || isLoggedIn === false) {
+  if (isChecking) {
     return (
         <div className="flex h-screen w-full items-center justify-center bg-background">
             <div className="text-xl font-semibold">Loading...</div>
         </div>
-    )
+    );
   }
 
   return (
