@@ -7,11 +7,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { Tractor, LogIn } from 'lucide-react';
+import Link from 'next/link';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -87,6 +88,14 @@ export function LoginForm() {
           </form>
         </Form>
       </CardContent>
+      <CardFooter className="flex justify-center">
+         <p className="text-sm">
+            Don't have an account?{' '}
+            <Link href="/register" className="font-semibold text-primary hover:underline">
+                Sign up
+            </Link>
+        </p>
+      </CardFooter>
     </Card>
   );
 }
