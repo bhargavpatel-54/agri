@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { Tractor, Send } from 'lucide-react';
 import Link from 'next/link';
+import { requestPasswordReset } from '@/ai/flows/reset-password-flow';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -27,13 +28,23 @@ export function ForgotPasswordForm() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log('Password reset request for:', values.email);
-    toast({
-      title: 'Request Sent',
-      description: 'If an account with that email exists, we have sent a password reset link.',
-    });
-    router.push('/login');
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      const result = await requestPasswordReset(values);
+      console.log('Simulated email content:', result.emailContent);
+      toast({
+        title: 'Request Sent',
+        description: 'If an account with that email exists, we have sent a password reset link.',
+      });
+      router.push('/login');
+    } catch (error) {
+      console.error('Failed to request password reset:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Could not process request. Please try again.',
+      });
+    }
   };
 
   return (
@@ -62,8 +73,8 @@ export function ForgotPasswordForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" size="lg">
-              <Send className="mr-2 h-5 w-5" /> Send Reset Link
+            <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" size="lg" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? 'Sending...' : <><Send className="mr-2 h-5 w-5" /> Send Reset Link</>}
             </Button>
           </form>
         </Form>

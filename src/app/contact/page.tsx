@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { handleContactForm } from '@/ai/flows/contact-flow';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name is required.' }),
@@ -31,13 +32,23 @@ export default function ContactPage() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log('Contact form submitted:', values);
-    toast({
-      title: 'Message Sent!',
-      description: "Thank you for contacting us. We'll get back to you shortly.",
-    });
-    form.reset();
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      const result = await handleContactForm(values);
+      console.log('Simulated email content:', result.emailContent);
+      toast({
+        title: 'Message Sent!',
+        description: "Thank you for contacting us. We'll get back to you shortly.",
+      });
+      form.reset();
+    } catch (error) {
+      console.error('Failed to handle contact form:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Could not send message. Please try again.',
+      });
+    }
   };
 
   return (
@@ -68,8 +79,8 @@ export default function ContactPage() {
                 <FormField control={form.control} name="message" render={({ field }) => (
                   <FormItem><FormLabel>Message</FormLabel><FormControl><Textarea placeholder="Your message here..." {...field} rows={5} /></FormControl><FormMessage /></FormItem>
                 )} />
-                <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" size="lg">
-                  <Send className="mr-2" /> Send Message
+                <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" size="lg" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? 'Sending...' : <><Send className="mr-2" /> Send Message</>}
                 </Button>
               </form>
             </Form>
